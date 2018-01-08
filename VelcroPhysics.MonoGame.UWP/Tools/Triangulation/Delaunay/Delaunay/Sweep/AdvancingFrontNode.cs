@@ -29,52 +29,36 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
-using VelcroPhysics.Tools.Triangulation.Delaunay.Delaunay;
+// Changes from the Java version
+//   Removed getters
+//   Has* turned into attributes
+// Future possibilities
+//   Comments!
 
-namespace VelcroPhysics.Tools.Triangulation.Delaunay
+namespace VelcroPhysics.Tools.Triangulation.Delaunay.Delaunay.Sweep
 {
-    internal abstract class TriangulationContext
+    internal class AdvancingFrontNode
     {
-        public readonly List<TriangulationPoint> Points = new List<TriangulationPoint>(200);
-        public readonly List<DelaunayTriangle> Triangles = new List<DelaunayTriangle>();
-        //private int _stepTime = -1;
+        public AdvancingFrontNode Next;
+        public TriangulationPoint Point;
+        public AdvancingFrontNode Prev;
+        public DelaunayTriangle Triangle;
+        public double Value;
 
-        public TriangulationContext()
+        public AdvancingFrontNode(TriangulationPoint point)
         {
-            Terminated = false;
+            Point = point;
+            Value = point.X;
         }
 
-        public TriangulationMode TriangulationMode { get; protected set; }
-        public Triangulatable Triangulatable { get; private set; }
-
-        public bool WaitUntilNotified { get; private set; }
-        public bool Terminated { get; set; }
-
-        public int StepCount { get; private set; }
-        public virtual bool IsDebugEnabled { get; protected set; }
-
-        public void Done()
+        public bool HasNext
         {
-            StepCount++;
+            get { return Next != null; }
         }
 
-        public virtual void PrepareTriangulation(Triangulatable t)
+        public bool HasPrev
         {
-            Triangulatable = t;
-            TriangulationMode = t.TriangulationMode;
-            t.PrepareTriangulation(this);
-        }
-
-        public abstract TriangulationConstraint NewConstraint(TriangulationPoint a, TriangulationPoint b);
-
-        public void Update(string message) { }
-
-        public virtual void Clear()
-        {
-            Points.Clear();
-            Terminated = false;
-            StepCount = 0;
+            get { return Prev != null; }
         }
     }
 }

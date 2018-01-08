@@ -30,51 +30,53 @@
  */
 
 using System.Collections.Generic;
-using VelcroPhysics.Tools.Triangulation.Delaunay.Delaunay;
+using VelcroPhysics.Tools.Triangulation.Delaunay.Delaunay.Sweep;
 
 namespace VelcroPhysics.Tools.Triangulation.Delaunay
 {
-    internal abstract class TriangulationContext
+    internal class TriangulationPoint
     {
-        public readonly List<TriangulationPoint> Points = new List<TriangulationPoint>(200);
-        public readonly List<DelaunayTriangle> Triangles = new List<DelaunayTriangle>();
-        //private int _stepTime = -1;
+        // List of edges this point constitutes an upper ending point (CDT)
 
-        public TriangulationContext()
+        public double X, Y;
+
+        public TriangulationPoint(double x, double y)
         {
-            Terminated = false;
+            X = x;
+            Y = y;
         }
 
-        public TriangulationMode TriangulationMode { get; protected set; }
-        public Triangulatable Triangulatable { get; private set; }
+        public List<DTSweepConstraint> Edges { get; private set; }
 
-        public bool WaitUntilNotified { get; private set; }
-        public bool Terminated { get; set; }
-
-        public int StepCount { get; private set; }
-        public virtual bool IsDebugEnabled { get; protected set; }
-
-        public void Done()
+        public float Xf
         {
-            StepCount++;
+            get { return (float)X; }
+            set { X = value; }
         }
 
-        public virtual void PrepareTriangulation(Triangulatable t)
+        public float Yf
         {
-            Triangulatable = t;
-            TriangulationMode = t.TriangulationMode;
-            t.PrepareTriangulation(this);
+            get { return (float)Y; }
+            set { Y = value; }
         }
 
-        public abstract TriangulationConstraint NewConstraint(TriangulationPoint a, TriangulationPoint b);
-
-        public void Update(string message) { }
-
-        public virtual void Clear()
+        public bool HasEdges
         {
-            Points.Clear();
-            Terminated = false;
-            StepCount = 0;
+            get { return Edges != null; }
+        }
+
+        public override string ToString()
+        {
+            return "[" + X + "," + Y + "]";
+        }
+
+        public void AddEdge(DTSweepConstraint e)
+        {
+            if (Edges == null)
+            {
+                Edges = new List<DTSweepConstraint>();
+            }
+            Edges.Add(e);
         }
     }
 }

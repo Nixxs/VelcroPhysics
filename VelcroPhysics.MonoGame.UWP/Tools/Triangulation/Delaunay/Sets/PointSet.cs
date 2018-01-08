@@ -32,49 +32,54 @@
 using System.Collections.Generic;
 using VelcroPhysics.Tools.Triangulation.Delaunay.Delaunay;
 
-namespace VelcroPhysics.Tools.Triangulation.Delaunay
+namespace VelcroPhysics.Tools.Triangulation.Delaunay.Sets
 {
-    internal abstract class TriangulationContext
+    internal class PointSet : Triangulatable
     {
-        public readonly List<TriangulationPoint> Points = new List<TriangulationPoint>(200);
-        public readonly List<DelaunayTriangle> Triangles = new List<DelaunayTriangle>();
-        //private int _stepTime = -1;
-
-        public TriangulationContext()
+        public PointSet(List<TriangulationPoint> points)
         {
-            Terminated = false;
+            Points = new List<TriangulationPoint>(points);
         }
 
-        public TriangulationMode TriangulationMode { get; protected set; }
-        public Triangulatable Triangulatable { get; private set; }
+        #region Triangulatable Members
 
-        public bool WaitUntilNotified { get; private set; }
-        public bool Terminated { get; set; }
+        public IList<TriangulationPoint> Points { get; private set; }
+        public IList<DelaunayTriangle> Triangles { get; private set; }
 
-        public int StepCount { get; private set; }
-        public virtual bool IsDebugEnabled { get; protected set; }
-
-        public void Done()
+        public virtual TriangulationMode TriangulationMode
         {
-            StepCount++;
+            get { return TriangulationMode.Unconstrained; }
         }
 
-        public virtual void PrepareTriangulation(Triangulatable t)
+        public void AddTriangle(DelaunayTriangle t)
         {
-            Triangulatable = t;
-            TriangulationMode = t.TriangulationMode;
-            t.PrepareTriangulation(this);
+            Triangles.Add(t);
         }
 
-        public abstract TriangulationConstraint NewConstraint(TriangulationPoint a, TriangulationPoint b);
-
-        public void Update(string message) { }
-
-        public virtual void Clear()
+        public void AddTriangles(IEnumerable<DelaunayTriangle> list)
         {
-            Points.Clear();
-            Terminated = false;
-            StepCount = 0;
+            foreach (DelaunayTriangle tri in list)
+                Triangles.Add(tri);
         }
+
+        public void ClearTriangles()
+        {
+            Triangles.Clear();
+        }
+
+        public virtual void PrepareTriangulation(TriangulationContext tcx)
+        {
+            if (Triangles == null)
+            {
+                Triangles = new List<DelaunayTriangle>(Points.Count);
+            }
+            else
+            {
+                Triangles.Clear();
+            }
+            tcx.Points.AddRange(Points);
+        }
+
+        #endregion
     }
 }

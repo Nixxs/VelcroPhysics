@@ -29,52 +29,35 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// Changes from the Java version
+//   Replaced getPolygons with attribute
+// Future possibilities
+//   Replace Add(Polygon) with exposed container?
+//   Replace entire class with HashSet<Polygon> ?
+
 using System.Collections.Generic;
-using VelcroPhysics.Tools.Triangulation.Delaunay.Delaunay;
 
-namespace VelcroPhysics.Tools.Triangulation.Delaunay
+namespace VelcroPhysics.Tools.Triangulation.Delaunay.Polygon
 {
-    internal abstract class TriangulationContext
+    internal class PolygonSet
     {
-        public readonly List<TriangulationPoint> Points = new List<TriangulationPoint>(200);
-        public readonly List<DelaunayTriangle> Triangles = new List<DelaunayTriangle>();
-        //private int _stepTime = -1;
+        protected List<Polygon> _polygons = new List<Polygon>();
 
-        public TriangulationContext()
+        public PolygonSet() { }
+
+        public PolygonSet(Polygon poly)
         {
-            Terminated = false;
+            _polygons.Add(poly);
         }
 
-        public TriangulationMode TriangulationMode { get; protected set; }
-        public Triangulatable Triangulatable { get; private set; }
-
-        public bool WaitUntilNotified { get; private set; }
-        public bool Terminated { get; set; }
-
-        public int StepCount { get; private set; }
-        public virtual bool IsDebugEnabled { get; protected set; }
-
-        public void Done()
+        public IEnumerable<Polygon> Polygons
         {
-            StepCount++;
+            get { return _polygons; }
         }
 
-        public virtual void PrepareTriangulation(Triangulatable t)
+        public void Add(Polygon p)
         {
-            Triangulatable = t;
-            TriangulationMode = t.TriangulationMode;
-            t.PrepareTriangulation(this);
-        }
-
-        public abstract TriangulationConstraint NewConstraint(TriangulationPoint a, TriangulationPoint b);
-
-        public void Update(string message) { }
-
-        public virtual void Clear()
-        {
-            Points.Clear();
-            Terminated = false;
-            StepCount = 0;
+            _polygons.Add(p);
         }
     }
 }

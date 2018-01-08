@@ -30,51 +30,40 @@
  */
 
 using System.Collections.Generic;
-using VelcroPhysics.Tools.Triangulation.Delaunay.Delaunay;
 
-namespace VelcroPhysics.Tools.Triangulation.Delaunay
+namespace VelcroPhysics.Tools.Triangulation.Delaunay.Delaunay.Sweep
 {
-    internal abstract class TriangulationContext
+    internal class DTSweepPointComparator : IComparer<TriangulationPoint>
     {
-        public readonly List<TriangulationPoint> Points = new List<TriangulationPoint>(200);
-        public readonly List<DelaunayTriangle> Triangles = new List<DelaunayTriangle>();
-        //private int _stepTime = -1;
+        #region IComparer<TriangulationPoint> Members
 
-        public TriangulationContext()
+        public int Compare(TriangulationPoint p1, TriangulationPoint p2)
         {
-            Terminated = false;
+            if (p1.Y < p2.Y)
+            {
+                return -1;
+            }
+            else if (p1.Y > p2.Y)
+            {
+                return 1;
+            }
+            else
+            {
+                if (p1.X < p2.X)
+                {
+                    return -1;
+                }
+                else if (p1.X > p2.X)
+                {
+                    return 1;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
         }
 
-        public TriangulationMode TriangulationMode { get; protected set; }
-        public Triangulatable Triangulatable { get; private set; }
-
-        public bool WaitUntilNotified { get; private set; }
-        public bool Terminated { get; set; }
-
-        public int StepCount { get; private set; }
-        public virtual bool IsDebugEnabled { get; protected set; }
-
-        public void Done()
-        {
-            StepCount++;
-        }
-
-        public virtual void PrepareTriangulation(Triangulatable t)
-        {
-            Triangulatable = t;
-            TriangulationMode = t.TriangulationMode;
-            t.PrepareTriangulation(this);
-        }
-
-        public abstract TriangulationConstraint NewConstraint(TriangulationPoint a, TriangulationPoint b);
-
-        public void Update(string message) { }
-
-        public virtual void Clear()
-        {
-            Points.Clear();
-            Terminated = false;
-            StepCount = 0;
-        }
+        #endregion
     }
 }

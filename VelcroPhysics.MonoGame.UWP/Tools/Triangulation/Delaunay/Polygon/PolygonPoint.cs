@@ -29,52 +29,18 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-using System.Collections.Generic;
-using VelcroPhysics.Tools.Triangulation.Delaunay.Delaunay;
+// Changes from the Java version
+//   Replaced get/set Next/Previous with attributes
+// Future possibilities
+//   Documentation!
 
-namespace VelcroPhysics.Tools.Triangulation.Delaunay
+namespace VelcroPhysics.Tools.Triangulation.Delaunay.Polygon
 {
-    internal abstract class TriangulationContext
+    internal class PolygonPoint : TriangulationPoint
     {
-        public readonly List<TriangulationPoint> Points = new List<TriangulationPoint>(200);
-        public readonly List<DelaunayTriangle> Triangles = new List<DelaunayTriangle>();
-        //private int _stepTime = -1;
+        public PolygonPoint(double x, double y) : base(x, y) { }
 
-        public TriangulationContext()
-        {
-            Terminated = false;
-        }
-
-        public TriangulationMode TriangulationMode { get; protected set; }
-        public Triangulatable Triangulatable { get; private set; }
-
-        public bool WaitUntilNotified { get; private set; }
-        public bool Terminated { get; set; }
-
-        public int StepCount { get; private set; }
-        public virtual bool IsDebugEnabled { get; protected set; }
-
-        public void Done()
-        {
-            StepCount++;
-        }
-
-        public virtual void PrepareTriangulation(Triangulatable t)
-        {
-            Triangulatable = t;
-            TriangulationMode = t.TriangulationMode;
-            t.PrepareTriangulation(this);
-        }
-
-        public abstract TriangulationConstraint NewConstraint(TriangulationPoint a, TriangulationPoint b);
-
-        public void Update(string message) { }
-
-        public virtual void Clear()
-        {
-            Points.Clear();
-            Terminated = false;
-            StepCount = 0;
-        }
+        public PolygonPoint Next { get; set; }
+        public PolygonPoint Previous { get; set; }
     }
 }
